@@ -31,6 +31,7 @@
             this.picBoxVideo = new System.Windows.Forms.PictureBox();
             this.btnTakePhoto = new System.Windows.Forms.Button();
             this.btnClose = new System.Windows.Forms.Button();
+            this.fbdImage = new System.Windows.Forms.FolderBrowserDialog();
             ((System.ComponentModel.ISupportInitialize)(this.picBoxVideo)).BeginInit();
             this.SuspendLayout();
             // 
@@ -83,6 +84,7 @@
         private System.Windows.Forms.PictureBox picBoxVideo;
         private System.Windows.Forms.Button btnTakePhoto;
         private System.Windows.Forms.Button btnClose;
+        private System.Windows.Forms.FolderBrowserDialog fbdImage;
     }
 }
 

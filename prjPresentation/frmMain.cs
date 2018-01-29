@@ -43,7 +43,9 @@ namespace prjPresentation
 
         private void btnTakePhoto_Click(object sender, EventArgs e)
         {
-            picBoxVideo.Image.Save("snapshot.png", System.Drawing.Imaging.ImageFormat.Png);
+            string fileName = "c:\\azure_images\\snapshot" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".png";
+            picBoxVideo.Image.Save(fileName, System.Drawing.Imaging.ImageFormat.Png);
+
         }
         protected override void OnClosed(EventArgs e)
         {

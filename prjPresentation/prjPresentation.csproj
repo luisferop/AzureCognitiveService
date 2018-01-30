@@ -54,16 +54,43 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="frmAzureAddPersonToGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAzureAddPersonToGroup.Designer.cs">
+      <DependentUpon>frmAzureAddPersonToGroup.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmAzureCreateGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmAzureCreateGroup.Designer.cs">
+      <DependentUpon>frmAzureCreateGroup.cs</DependentUpon>
+    </Compile>
     <Compile Include="frmMain.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="frmMain.Designer.cs">
       <DependentUpon>frmMain.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmTrainingGroup.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmTrainingGroup.Designer.cs">
+      <DependentUpon>frmTrainingGroup.cs</DependentUpon>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <EmbeddedResource Include="frmAzureAddPersonToGroup.resx">
+      <DependentUpon>frmAzureAddPersonToGroup.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmAzureCreateGroup.resx">
+      <DependentUpon>frmAzureCreateGroup.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="frmMain.resx">
       <DependentUpon>frmMain.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmTrainingGroup.resx">
+      <DependentUpon>frmTrainingGroup.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -87,6 +114,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\prjAzure\prjAzure.csproj">
+      <Project>{43614777-b496-4055-8b5b-0dd92d4a388a}</Project>
+      <Name>prjAzure</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

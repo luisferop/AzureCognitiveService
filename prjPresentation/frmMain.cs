@@ -1,5 +1,7 @@
 ﻿using AForge.Video.DirectShow;
+using Microsoft.ProjectOxford.Face.Contract;
 using prjAzure;
+using prjAzure.VideoFrameAnalyzer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -87,6 +89,64 @@ namespace prjPresentation
             frmTrainingGroup frmTrainingGroup = new frmTrainingGroup();
             frmTrainingGroup.ShowDialog();
             
+        }
+
+
+        private void btnAutomaticRecognition_Click(object sender, EventArgs e)
+        {
+            // Create grabber. 
+            FrameGrabber<Face[]> grabber = new FrameGrabber<Face[]>();
+
+            // Create Face API Client.
+            //FaceServiceClient faceClient = new FaceServiceClient(subscriptionKey, uriAzureBase);
+
+            // Set up a listener for when we acquire a new frame.
+            grabber.NewFrameProvided += (s, ef) =>
+            {
+                //txtResult.Text =  $"New frame acquired at {ef.Frame.Metadata.Timestamp}";
+            };
+
+            // Set up Face API call.
+            grabber.AnalysisFunction = async frame =>
+            {
+                //txtResult.Text = $"Submitting frame acquired at {frame.Metadata.Timestamp}";
+                // Encode image and submit to Face API. 
+                return await new AzureFaceAPIRecognition().DetectFaces(frame.Image.ToMemoryStream(".jpg"));
+            };
+
+            // Set up a listener for when we receive a new result from an API call. 
+            grabber.NewResultAvailable += (s, ef) =>
+            {
+                if (ef.TimedOut)
+                {
+                    //txtResult.Text = $"API call timed out.";
+                }
+                else if (ef.Exception != null)
+                {
+                    //txtResult.Text = $"API call threw an exception.";
+                }
+                    
+                else
+                {
+                    //txtResult.Text = $"New result received for frame acquired at {ef.Frame.Metadata.Timestamp}. {ef.Analysis.Length} faces detected";
+
+                }
+
+            };
+
+            // Tell grabber when to call API.
+            // See also TriggerAnalysisOnPredicate
+            grabber.TriggerAnalysisOnInterval(TimeSpan.FromMilliseconds(10000));
+
+            // Start running in the background.
+            grabber.StartProcessingCameraAsync().Wait();
+
+            // Wait for keypress to stop
+            //Console.WriteLine("Press any key to stop...");
+            //Console.ReadKey();
+
+            //// Stop, blocking until done.
+            //grabber.StopProcessingAsync().Wait();
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Microsoft.ProjectOxford.Face;
 using Microsoft.ProjectOxford.Face.Contract;
+using prjAzure.VideoFrameAnalyzer;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -19,9 +20,10 @@ namespace prjAzure
         const string uriBaseDetect = uriAzureBase + "/detect";
         const string uriBaseCreateGroup = uriAzureBase + "/persongroups/";
         const string uriBaseAddPersonToGroup = uriAzureBase + "persongroups/@personGroupId/persons";
+        FaceServiceClient faceServiceClient = null;
         public AzureFaceAPIRecognition()
         {
-
+            faceServiceClient = new FaceServiceClient(subscriptionKey, uriAzureBase);
         }
         #region Face API Detection
         public async Task<string> MakeAnalysisRequest(string imageFilePath)
@@ -58,7 +60,11 @@ namespace prjAzure
                 return JsonPrettyPrint(contentString);
             }
         }
-       
+
+        public async Task<Face[]> DetectFaces(Stream stream)
+        {
+            return await faceServiceClient.DetectAsync(stream);
+        }
         #endregion
 
         #region Create Groups
@@ -90,7 +96,7 @@ namespace prjAzure
         }
         public async Task<string> AddPeopleToGroup(string personGroupId, string personName, string personLogin)
         {
-            var faceServiceClient = new FaceServiceClient(subscriptionKey, uriAzureBase);
+
             
             CreatePersonResult friend = await faceServiceClient.CreatePersonAsync(
                 // Id of the person group that the person belonged to
@@ -112,7 +118,6 @@ namespace prjAzure
         }
         public async void TrainingGroup(string groupId)
         {
-            var faceServiceClient = new FaceServiceClient(subscriptionKey, uriAzureBase);
             await faceServiceClient.TrainPersonGroupAsync(groupId);
             TrainingStatus trainingStatus = null;
             while (true)
@@ -132,7 +137,6 @@ namespace prjAzure
         #region Identify Person
         public async Task<string> IdentifyPerson(string groupId, string imageFile)
         {
-            var faceServiceClient = new FaceServiceClient(subscriptionKey, uriAzureBase);
             string strPerson = "No one identified";
             using (Stream s = File.OpenRead(imageFile))
             {
@@ -157,6 +161,10 @@ namespace prjAzure
                 }
             }
             return strPerson;
+        }
+        public async Task<string> IdentifyPerson(string groupId, Face[] face)
+        {
+            return string.Empty;
         }
         #endregion
 

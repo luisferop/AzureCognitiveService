@@ -7,8 +7,10 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -23,20 +25,20 @@ namespace prjPresentation
             InitializeComponent();
             AForge.Video.DirectShow.FilterInfoCollection videosources = new AForge.Video.DirectShow.FilterInfoCollection(AForge.Video.DirectShow.FilterCategory.VideoInputDevice);
 
-            if (videosources != null)
-            {
-                videoSource = new AForge.Video.DirectShow.VideoCaptureDevice(videosources[0].MonikerString);
-                videoSource.NewFrame += (s, e) =>
-                {
-                    if (picBoxVideo.Image != null)
-                    {
-                        picBoxVideo.Image.Dispose();
-                    }
+            //if (videosources != null)
+            //{
+            //    videoSource = new AForge.Video.DirectShow.VideoCaptureDevice(videosources[0].MonikerString);
+            //    videoSource.NewFrame += (s, e) =>
+            //    {
+            //        if (picBoxVideo.Image != null)
+            //        {
+            //            picBoxVideo.Image.Dispose();
+            //        }
 
-                    picBoxVideo.Image = (Bitmap)e.Frame.Clone();
-                };
-                videoSource.Start();
-            }
+            //        picBoxVideo.Image = (Bitmap)e.Frame.Clone();
+            //    };
+            //    videoSource.Start();
+            //}
         }
 
         private void btnClose_Click(object sender, EventArgs e)
@@ -46,7 +48,7 @@ namespace prjPresentation
 
         private void btnTakePhoto_Click(object sender, EventArgs e)
         {
-            currentPhoto = @"c:\\azure_photos\\snapshot" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".png";
+            currentPhoto = @"c:\azure_photos\snapshot" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".png";
             picBoxVideo.Image.Save(currentPhoto, System.Drawing.Imaging.ImageFormat.Png);
         }
         protected override void OnClosed(EventArgs e)
@@ -111,6 +113,18 @@ namespace prjPresentation
             {
                 //txtResult.Text = $"Submitting frame acquired at {frame.Metadata.Timestamp}";
                 // Encode image and submit to Face API. 
+                Stream stream = frame.Image.ToMemoryStream(".jpg");
+                string fileName = @"c:\azure_photos\snapshot_" + DateTime.Now.ToString("yyyy_MM_dd_HH_mm_ss") + ".jpg";
+                var fileStream = File.Create(fileName);
+                stream.Seek(0, SeekOrigin.Begin);
+                stream.CopyTo(fileStream);
+                fileStream.Close();
+
+                //using (Stream file = File.Create(fileName))
+                //{
+                //    CopyStream(stream, file);
+                //}
+                string test = await new AzureFaceAPIRecognition().MakeAnalysisRequest(currentPhoto);
                 return await new AzureFaceAPIRecognition().DetectFaces(frame.Image.ToMemoryStream(".jpg"));
             };
 
@@ -126,8 +140,9 @@ namespace prjPresentation
                     //txtResult.Text = $"API call threw an exception.";
                 }
                     
-                else
+                else if(ef.Analysis.Length > 0)
                 {
+
                     //txtResult.Text = $"New result received for frame acquired at {ef.Frame.Metadata.Timestamp}. {ef.Analysis.Length} faces detected";
 
                 }
@@ -136,7 +151,7 @@ namespace prjPresentation
 
             // Tell grabber when to call API.
             // See also TriggerAnalysisOnPredicate
-            grabber.TriggerAnalysisOnInterval(TimeSpan.FromMilliseconds(10000));
+            grabber.TriggerAnalysisOnInterval(TimeSpan.FromMilliseconds(5000));
 
             // Start running in the background.
             grabber.StartProcessingCameraAsync().Wait();
@@ -147,6 +162,15 @@ namespace prjPresentation
 
             //// Stop, blocking until done.
             //grabber.StopProcessingAsync().Wait();
+        }
+        private void CopyStream(Stream input, Stream output)
+        {
+            byte[] buffer = new byte[8 * 1024];
+            int len;
+            while ((len = input.Read(buffer, 0, buffer.Length)) > 0)
+            {
+                output.Write(buffer, 0, len);
+            }
         }
     }
 }

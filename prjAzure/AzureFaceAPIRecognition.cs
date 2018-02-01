@@ -63,7 +63,7 @@ namespace prjAzure
 
         public async Task<Face[]> DetectFaces(Stream stream)
         {
-            return await faceServiceClient.DetectAsync(stream);
+            return await faceServiceClient.DetectAsync(stream, returnFaceLandmarks: true);
         }
         #endregion
 
